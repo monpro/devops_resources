@@ -3,3 +3,5 @@
 *.tfstate
 *.info
 *.backup
+*.pub
+mykey
