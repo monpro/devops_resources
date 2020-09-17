@@ -78,7 +78,7 @@ resource "aws_subnet" "main-private-3" {
 }
 
 # set up Internet Gateway to communicate with outside vpc
-resource "aws_internent_gateway" "main-gw" {
+resource "aws_internet_gateway" "main-gw" {
     vpc_id = aws_vpc.main.id
 
     tags = {
@@ -92,7 +92,7 @@ resource "aws_route_table" "main-public" {
     route {
         # route all the traffic to gateway except internal ones
         cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internent_gateway.main-gw.id
+        gateway_id = aws_internet_gateway.main-gw.id
     }
 
     tags = {
@@ -100,7 +100,7 @@ resource "aws_route_table" "main-public" {
     }
 }
 
-# route associations public with route tables
+# associations between public subnet route with route table
 resource "aws_route_table_association" "main-public-1-a" {
     subnet_id = aws_subnet.main-public-1.id
     route_table_id = aws_route_table.main-public.id
