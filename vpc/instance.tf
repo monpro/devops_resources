@@ -10,6 +10,9 @@ resource "aws_instance" "vpc-example" {
 
     # set the public ssh key, then you could use the private key to ssh
     key_name = aws_key_pair.vpc-test-key.key_name
+
+    # install user data
+    user_data = data.template_cloudinit_config.cloudinit-example.rendered
 }
 
 resource "aws_ebs_volume" "ebs-volume-1" {
@@ -25,4 +28,5 @@ resource "aws_volume_attachment" "ebs-volume-1-attachment" {
     device_name = "/dev/xvdh"
     volume_id = aws_ebs_volume.ebs-volume-1.id
     instance_id = aws_instance.vpc-example.id
+    skip_destroy = true                            # skip destroy to avoid issues with terraform destroy
 }
