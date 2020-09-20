@@ -5,3 +5,4 @@
 *.backup
 *.pub
 mykey
+node_modules/
