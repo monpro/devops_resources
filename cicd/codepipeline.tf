@@ -13,7 +13,7 @@ resource "aws_codepipeline" "demo" {
       type = "KMS"
     }
   }
-
+  /** source is code commit
   stage {
     name = "Source"
 
@@ -28,6 +28,26 @@ resource "aws_codepipeline" "demo" {
       configuration = {
         RepositoryName = aws_codecommit_repository.demo.repository_name
         BranchName     = "master"
+      }
+    }
+  }
+  **/
+  stage {
+    name = "Source"
+
+    action {
+      name             = "Source"
+      category         = "Source"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
+      version          = "1"
+      output_artifacts = ["demo-docker-source"]
+
+      configuration = {
+        Owner       = "monpro"
+        Repo        = "cicd-demo-repo"
+        Branch      = "master"
+        OAuthToken  = var.github_token
       }
     }
   }
