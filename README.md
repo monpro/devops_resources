@@ -1,12 +1,10 @@
 # Terraform Collection
 
-This repo includes many resources regrading **Terraform** based on **AWS**. It's mainly for learn and review. 
-
-Building infrastructure is always fun and really wish this module would give you guys some inspiration. Appreciate it. 
+This repo includes many **Terraform** resources based on **AWS** and CloudFormation templates.
 
 
 
-## Resources
+## Terraform Resources
 
 - ec2
 - module
@@ -19,3 +17,7 @@ Building infrastructure is always fun and really wish this module would give you
 - auto scaling
 - beanstalk
 - iam
+
+## CloudFormation Templates
+
+- templates illustrating the use of parameters
