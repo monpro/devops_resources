@@ -5,4 +5,13 @@
 *.backup
 *.pub
 mykey
-node_modules/
+
+.cdk.staging
+cdk.out
+*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+.idea/
+demo-app/
