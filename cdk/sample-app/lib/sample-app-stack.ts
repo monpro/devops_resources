@@ -4,6 +4,7 @@ import {Bucket, BucketEncryption} from "@aws-cdk/aws-s3";
 import {Runtime} from "@aws-cdk/aws-lambda";
 import * as path from "path";
 import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
+import {PolicyStatement} from "@aws-cdk/aws-iam";
 
 export class SampleAppStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -28,6 +29,17 @@ export class SampleAppStack extends cdk.Stack {
         PHOTO_BUCKET_NAME: bucket.bucketName
       }
     });
+
+    const bucketContainerPermissions = new PolicyStatement();
+    bucketContainerPermissions.addResources(bucket.bucketArn);
+    bucketContainerPermissions.addActions('s3:ListBucket');
+
+    const bucketObjectPermissions = new PolicyStatement();
+    bucketObjectPermissions.addResources(`${bucket.bucketArn}/*`);
+    bucketObjectPermissions.addActions('s3:GetObject', 's3:PutObject');
+
+    getPhotos.addToRolePolicy(bucketContainerPermissions);
+    getPhotos.addToRolePolicy(bucketObjectPermissions);
 
     new cdk.CfnOutput(this, 'SampleBucketNameExport', {
       value: bucket.bucketName,
