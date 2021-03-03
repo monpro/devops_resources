@@ -7,13 +7,19 @@ import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {HttpApi, HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {LambdaProxyIntegration} from "@aws-cdk/aws-apigatewayv2-integrations";
-import {CloudFrontWebDistribution} from "@aws-cdk/aws-cloudfront";
+import {CloudFrontWebDistribution, Distribution} from "@aws-cdk/aws-cloudfront";
+import {IPublicHostedZone} from "@aws-cdk/aws-route53";
+import {ICertificate} from "@aws-cdk/aws-certificatemanager";
+import {S3Origin} from "@aws-cdk/aws-cloudfront-origins";
 
 interface SampleAppStackProps extends cdk.StackProps{
+  dnsName: string;
+  hostedZone: IPublicHostedZone;
+  certificate: ICertificate;
 }
 
 export class SampleAppStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: SampleAppStackProps) {
+  constructor(scope: cdk.Construct, id: string, props: SampleAppStackProps) {
     super(scope, id, props);
 
     const bucket = new Bucket(this, 'SampleBucket', {
@@ -73,15 +79,10 @@ export class SampleAppStack extends cdk.Stack {
       publicReadAccess: true
     });
 
-    const cloudFront = new CloudFrontWebDistribution(this, 'SampleAppDistribution', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: websiteBucket
-          },
-          behaviors: [{isDefaultBehavior: true}]
-        }
-      ],
+    const cloudFront = new Distribution(this, 'SampleAppDistribution', {
+      defaultBehavior: {origin: new S3Origin(websiteBucket)},
+      domainNames: [props.dnsName],
+      certificate: props.certificate
     });
 
     new BucketDeployment(this, 'SampleWebsiteDeploy', {

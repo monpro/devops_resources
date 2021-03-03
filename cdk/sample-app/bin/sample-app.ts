@@ -6,7 +6,13 @@ import {SampleAppStackDns} from "../lib/sample-app-stack-dns";
 
 const domainName = 'monproshen.com';
 const app = new cdk.App();
-new SampleAppStack(app, 'SampleAppStack');
-new SampleAppStackDns(app, 'SampleAppStackDns', {
+
+const { hostedZone, certificate } = new SampleAppStackDns(app, 'SampleAppStackDns', {
   dnsName: domainName
+});
+
+new SampleAppStack(app, 'SampleAppStack', {
+  dnsName: domainName,
+  hostedZone,
+  certificate
 });
