@@ -10,7 +10,6 @@ import {LambdaProxyIntegration} from "@aws-cdk/aws-apigatewayv2-integrations";
 import {CloudFrontWebDistribution} from "@aws-cdk/aws-cloudfront";
 
 interface SampleAppStackProps extends cdk.StackProps{
-  envName: string;
 }
 
 export class SampleAppStack extends cdk.Stack {
@@ -18,7 +17,7 @@ export class SampleAppStack extends cdk.Stack {
     super(scope, id, props);
 
     const bucket = new Bucket(this, 'SampleBucket', {
-      encryption: props?.envName === 'prod' ? BucketEncryption.S3_MANAGED : BucketEncryption.UNENCRYPTED
+      encryption: BucketEncryption.S3_MANAGED
     });
 
     new BucketDeployment(this, 'SampleAppPhotos', {
@@ -94,22 +93,22 @@ export class SampleAppStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, 'SampleBucketNameExport', {
       value: bucket.bucketName,
-      exportName: `SampleBucketName${props?.envName}`
+      exportName: `SampleBucketName`
     });
 
     new cdk.CfnOutput(this, 'SampleApiGatewayUrlExport', {
       value: httpApiGateway.url!,
-      exportName: `SampleApiGatewayUrl${props?.envName}`
+      exportName: `SampleApiGatewayUrl`
     });
 
     new cdk.CfnOutput(this, 'SampleWebsiteBucketNameExport', {
       value: websiteBucket.bucketName,
-      exportName: `SampleWebsiteBucketName${props?.envName}`
+      exportName: `SampleWebsiteBucketName`
     });
 
     new cdk.CfnOutput(this, 'SampleWebsiteUrl', {
       value: cloudFront.distributionDomainName,
-      exportName: `SampleWebsiteUrl${props?.envName}`
+      exportName: `SampleWebsiteUrl`
     })
   }
 }
