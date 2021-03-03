@@ -5,6 +5,8 @@ import {Runtime} from "@aws-cdk/aws-lambda";
 import * as path from "path";
 import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
+import {HttpApi, HttpMethod} from "@aws-cdk/aws-apigatewayv2";
+import {LambdaProxyIntegration} from "@aws-cdk/aws-apigatewayv2-integrations";
 
 export class SampleAppStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -41,10 +43,36 @@ export class SampleAppStack extends cdk.Stack {
     getPhotos.addToRolePolicy(bucketContainerPermissions);
     getPhotos.addToRolePolicy(bucketObjectPermissions);
 
+    const httpApiGateway = new HttpApi(this, 'SampleApiGateway', {
+      corsPreflight: {
+        allowOrigins: ['*'],
+        allowMethods: [HttpMethod.GET]
+      },
+      apiName: 'photo-api',
+      createDefaultStage: true
+    });
+
+    const lambdaIntegration = new LambdaProxyIntegration({
+      handler: getPhotos
+    });
+
+    httpApiGateway.addRoutes({
+      path: '/photos',
+      methods: [
+        HttpMethod.GET
+      ],
+      integration: lambdaIntegration
+    });
+
     new cdk.CfnOutput(this, 'SampleBucketNameExport', {
       value: bucket.bucketName,
       exportName: "SampleBucketName"
-    })
+    });
+
+    new cdk.CfnOutput(this, 'SampleApiGatewayUrlExport', {
+      value: httpApiGateway.url!,
+      exportName: 'SampleApiGatewayUrl'
+    });
 
   }
 }
