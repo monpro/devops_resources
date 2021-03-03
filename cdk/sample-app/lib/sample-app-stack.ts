@@ -64,6 +64,16 @@ export class SampleAppStack extends cdk.Stack {
       integration: lambdaIntegration
     });
 
+    const websiteBucket = new Bucket(this, 'SampleWebsiteBucket', {
+      websiteIndexDocument: 'index.html',
+      publicReadAccess: true
+    });
+
+    new BucketDeployment(this, 'SampleWebsiteDeploy', {
+      sources: [Source.asset(path.join(__dirname, '..', 'frontend', 'build'))],
+      destinationBucket: websiteBucket
+    });
+
     new cdk.CfnOutput(this, 'SampleBucketNameExport', {
       value: bucket.bucketName,
       exportName: "SampleBucketName"
@@ -74,5 +84,9 @@ export class SampleAppStack extends cdk.Stack {
       exportName: 'SampleApiGatewayUrl'
     });
 
+    new cdk.CfnOutput(this, 'SampleWebsiteBucketNameExport', {
+      value: websiteBucket.bucketName,
+      exportName: 'SampleWebsiteBucketName'
+    })
   }
 }
