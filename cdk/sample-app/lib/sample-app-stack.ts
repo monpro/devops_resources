@@ -7,10 +7,11 @@ import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {HttpApi, HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {LambdaProxyIntegration} from "@aws-cdk/aws-apigatewayv2-integrations";
-import {CloudFrontWebDistribution, Distribution} from "@aws-cdk/aws-cloudfront";
-import {IPublicHostedZone} from "@aws-cdk/aws-route53";
+import {Distribution} from "@aws-cdk/aws-cloudfront";
+import {ARecord, IPublicHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {ICertificate} from "@aws-cdk/aws-certificatemanager";
 import {S3Origin} from "@aws-cdk/aws-cloudfront-origins";
+import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets";
 
 interface SampleAppStackProps extends cdk.StackProps{
   dnsName: string;
@@ -83,6 +84,11 @@ export class SampleAppStack extends cdk.Stack {
       defaultBehavior: {origin: new S3Origin(websiteBucket)},
       domainNames: [props.dnsName],
       certificate: props.certificate
+    });
+
+    new ARecord(this, 'SampleAppARecordApex', {
+      zone: props.hostedZone,
+      target: RecordTarget.fromAlias(new CloudFrontTarget(cloudFront))
     });
 
     new BucketDeployment(this, 'SampleWebsiteDeploy', {
