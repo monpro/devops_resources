@@ -7,6 +7,7 @@ import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {HttpApi, HttpMethod} from "@aws-cdk/aws-apigatewayv2";
 import {LambdaProxyIntegration} from "@aws-cdk/aws-apigatewayv2-integrations";
+import {CloudFrontWebDistribution} from "@aws-cdk/aws-cloudfront";
 
 export class SampleAppStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -69,10 +70,23 @@ export class SampleAppStack extends cdk.Stack {
       publicReadAccess: true
     });
 
+    const cloudFront = new CloudFrontWebDistribution(this, 'SampleAppDistribution', {
+      originConfigs: [
+        {
+          s3OriginSource: {
+            s3BucketSource: websiteBucket
+          },
+          behaviors: [{isDefaultBehavior: true}]
+        }
+      ],
+    });
+
     new BucketDeployment(this, 'SampleWebsiteDeploy', {
       sources: [Source.asset(path.join(__dirname, '..', 'frontend', 'build'))],
-      destinationBucket: websiteBucket
+      destinationBucket: websiteBucket,
+      distribution: cloudFront
     });
+
 
     new cdk.CfnOutput(this, 'SampleBucketNameExport', {
       value: bucket.bucketName,
@@ -87,6 +101,11 @@ export class SampleAppStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'SampleWebsiteBucketNameExport', {
       value: websiteBucket.bucketName,
       exportName: 'SampleWebsiteBucketName'
+    });
+
+    new cdk.CfnOutput(this, 'SampleWebsiteUrl', {
+      value: cloudFront.distributionDomainName,
+      exportName: 'SampleWebsiteUrl'
     })
   }
 }
