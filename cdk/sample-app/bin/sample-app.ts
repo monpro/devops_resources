@@ -8,17 +8,11 @@ const domainName = 'monproshen.com';
 const app = new cdk.App();
 
 const { hostedZone, certificate } = new SampleAppStackDns(app, 'SampleAppStackDns', {
-  dnsName: domainName,
-  env: {
-    region: 'us-east-2'
-  }
+  dnsName: domainName
 });
 
 new SampleAppStack(app, 'SampleAppStack', {
   dnsName: domainName,
   hostedZone,
-  certificate,
-  env: {
-    region: 'us-east-2'
-  }
+  certificate
 });

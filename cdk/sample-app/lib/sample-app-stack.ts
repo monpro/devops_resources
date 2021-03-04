@@ -12,6 +12,7 @@ import {ARecord, IPublicHostedZone, RecordTarget} from "@aws-cdk/aws-route53";
 import {ICertificate} from "@aws-cdk/aws-certificatemanager";
 import {S3Origin} from "@aws-cdk/aws-cloudfront-origins";
 import {CloudFrontTarget} from "@aws-cdk/aws-route53-targets";
+import {S3BucketWithDeploy} from "./s3-bucket-with-deploy";
 
 interface SampleAppStackProps extends cdk.StackProps{
   dnsName: string;
@@ -23,15 +24,9 @@ export class SampleAppStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: SampleAppStackProps) {
     super(scope, id, props);
 
-    const bucket = new Bucket(this, 'SampleBucket', {
+    const { bucket } = new S3BucketWithDeploy(this, 'SampleBucketConstructor', {
+      deployFrom: ['..', 'photos'],
       encryption: BucketEncryption.S3_MANAGED
-    });
-
-    new BucketDeployment(this, 'SampleAppPhotos', {
-      sources: [
-        Source.asset(path.join(__dirname, '..', 'photos'))
-      ],
-      destinationBucket: bucket
     });
 
     const getPhotos = new lambda.NodejsFunction(this, 'SampleLambda', {

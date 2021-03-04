@@ -6,6 +6,7 @@ import '@aws-cdk/assert/jest';
 test('Empty Stack', () => {
   const app = new cdk.App();
   // WHEN
+  // @ts-ignore
   const stack = new SampleApp.SampleAppStack(app, 'MyTestStack');
   // THEN
   expectCDK(stack).to(matchTemplate({
@@ -43,6 +44,7 @@ test('Empty Stack', () => {
 test('Stack create a s3 bucket', () => {
   const app = new cdk.App();
   // WHEN
+  // @ts-ignore
   const stack = new SampleApp.SampleAppStack(app, 'MyTestStack');
   // THEN
   expect(stack).toHaveResource('AWS::S3::Bucket')
