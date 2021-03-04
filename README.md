@@ -1,6 +1,6 @@
-# Terraform Collection
+# Devops Resources
 
-This repo includes many **Terraform** resources based on **AWS** and CloudFormation templates.
+This repo includes many **Terraform** resources based on **AWS**, **CloudFormation** templates and **CDK** files.
 
 
 
