@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
+import * as ssm from '@aws-cdk/aws-ssm';
 
 interface SecurityStackProps extends cdk.StackProps {
   envName: string;
@@ -13,6 +14,8 @@ export class SecurityStack extends cdk.Stack {
 
   constructor(scope: cdk.Construct, id: string, vpc: ec2.Vpc, props: SecurityStackProps) {
     super(scope, id, props);
+
+    const {envName} = props;
 
     this.lambdaSg = new ec2.SecurityGroup(this, 'lambdaSg', {
       securityGroupName: 'lambda-sg',
@@ -46,6 +49,21 @@ export class SecurityStack extends cdk.Stack {
           actions: ['s3:*', 'rds:*'],
           resources: ['*']
         })
-    )
+    );
+
+    new ssm.StringParameter(this, 'lambdaSqParamater', {
+      parameterName: `/${envName}/lambdaSq`,
+      stringValue: this.lambdaSg.securityGroupId
+    });
+
+    new ssm.StringParameter(this, 'lambdaRoleArn', {
+      parameterName: `/${envName}/lambdaRoleArn`,
+      stringValue: this.lambdaRole.roleArn
+    });
+
+    new ssm.StringParameter(this, 'lambdaRoleName', {
+      parameterName: `/${envName}/lambdaRoleName`,
+      stringValue: this.lambdaRole.roleName
+    });
   }
 }
