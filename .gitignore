@@ -15,3 +15,6 @@ node_modules
 
 .idea/
 demo-app/
+
+.venv
+*.bat
