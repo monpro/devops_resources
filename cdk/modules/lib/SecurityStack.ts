@@ -1,5 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as iam from '@aws-cdk/aws-iam';
 
 interface SecurityStackProps extends cdk.StackProps {
   envName: string;
@@ -8,6 +9,7 @@ interface SecurityStackProps extends cdk.StackProps {
 export class SecurityStack extends cdk.Stack {
   private readonly lambdaSg: ec2.SecurityGroup;
   private readonly bastionSg: ec2.SecurityGroup;
+  private readonly lambdaRole: iam.Role;
 
   constructor(scope: cdk.Construct, id: string, vpc: ec2.Vpc, props: SecurityStackProps) {
     super(scope, id, props);
@@ -24,6 +26,26 @@ export class SecurityStack extends cdk.Stack {
       vpc,
       description: 'security group for bastion host',
       allowAllOutbound: true
-    })
+    });
+
+    this.bastionSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'ingress rule for ssh');
+
+    this.lambdaRole = new iam.Role(this, 'lambdaRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      roleName: 'lambdaRole',
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName(
+          'service-role/AWSLambdaVPCAccessExecutionRole'
+        )
+      ]
+    });
+
+    this.lambdaRole.addToPolicy(
+      new iam.PolicyStatement(
+        {
+          actions: ['s3:*', 'rds:*'],
+          resources: ['*']
+        })
+    )
   }
 }
