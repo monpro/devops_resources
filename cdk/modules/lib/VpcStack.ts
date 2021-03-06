@@ -8,7 +8,7 @@ interface VpcStackProps extends cdk.StackProps {
 }
 
 export class VpcStack extends cdk.Stack {
-  private readonly vpc: ec2.Vpc;
+  public readonly vpc: ec2.Vpc;
 
   constructor(scope: cdk.Construct, id: string, props: VpcStackProps) {
     super(scope, id, props);
