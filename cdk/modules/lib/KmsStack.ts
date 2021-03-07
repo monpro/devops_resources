@@ -1,5 +1,4 @@
 import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
 import * as kms from '@aws-cdk/aws-kms';
 import * as ssm from '@aws-cdk/aws-ssm';
 
