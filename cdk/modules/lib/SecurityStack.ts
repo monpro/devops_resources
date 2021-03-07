@@ -8,9 +8,9 @@ interface SecurityStackProps extends cdk.StackProps {
 }
 
 export class SecurityStack extends cdk.Stack {
-  private readonly lambdaSg: ec2.SecurityGroup;
-  private readonly bastionSg: ec2.SecurityGroup;
-  private readonly lambdaRole: iam.Role;
+  public readonly lambdaSg: ec2.SecurityGroup;
+  public readonly bastionSg: ec2.SecurityGroup;
+  public readonly lambdaRole: iam.Role;
 
   constructor(scope: cdk.Construct, id: string, vpc: ec2.Vpc, props: SecurityStackProps) {
     super(scope, id, props);
