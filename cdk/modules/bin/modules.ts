@@ -47,6 +47,6 @@ new S3Stack(app, 'S3Stack', {
   removalPolicy: cdk.RemovalPolicy.DESTROY
 });
 
-new RdsStack(app, 'RdsStack', vpc, lambdaSg, bastionSg, rdsKey, {
+new RdsStack(app, 'RdsStack', vpc, [lambdaSg, bastionSg], rdsKey, {
   envName: 'dev'
 });
