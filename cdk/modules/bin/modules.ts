@@ -8,6 +8,7 @@ import {KmsStack} from "../lib/KmsStack";
 import {S3Stack} from "../lib/S3Stack";
 import * as s3 from "@aws-cdk/aws-s3";
 import {RdsStack} from "../lib/RdsStack";
+import {RedisStack} from "../lib/RedisStack";
 
 const app = new cdk.App();
 const {vpc} = new VpcStack(app, 'VpcStack', {
@@ -48,5 +49,9 @@ new S3Stack(app, 'S3Stack', {
 });
 
 new RdsStack(app, 'RdsStack', vpc, [lambdaSg, bastionSg], rdsKey, {
+  envName: 'dev'
+});
+
+new RedisStack(app, 'RedisStack', vpc, [cdk.Fn.importValue('redisSgAllowLambda')], {
   envName: 'dev'
 });

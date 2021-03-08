@@ -51,6 +51,15 @@ export class SecurityStack extends cdk.Stack {
         })
     );
 
+    const redisSg = new ec2.SecurityGroup(this, 'redisSg', {
+      securityGroupName: 'redis-sg',
+      vpc,
+      description: 'security group for redis',
+      allowAllOutbound: true
+    });
+
+    redisSg.addIngressRule(this.lambdaSg, ec2.Port.tcp(6379), 'Access from lambda function');
+
     new ssm.StringParameter(this, 'lambdaSqParamater', {
       parameterName: `/${envName}/lambdaSq`,
       stringValue: this.lambdaSg.securityGroupId
@@ -65,5 +74,10 @@ export class SecurityStack extends cdk.Stack {
       parameterName: `/${envName}/lambdaRoleName`,
       stringValue: this.lambdaRole.roleName
     });
+
+    new cdk.CfnOutput(this, 'redisExportSg', {
+      exportName: 'redisSgGroupId',
+      value: redisSg.securityGroupId
+    })
   }
 }
