@@ -10,9 +10,9 @@ interface KmsStackProps extends cdk.StackProps {
 }
 
 export class KmsStack extends cdk.Stack {
-  private readonly kmsKey: kms.Key;
+  public readonly kmsKey: kms.Key;
 
-  constructor(scope: cdk.Construct, id: string, props: KmsStackProps ) {
+  constructor(scope: cdk.Construct, id: string, props: KmsStackProps) {
     super(scope, id, props);
 
     const {
