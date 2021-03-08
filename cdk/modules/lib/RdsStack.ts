@@ -8,17 +8,32 @@ import * as kms from '@aws-cdk/aws-kms';
 
 interface RdsStackProps extends cdk.StackProps {
   envName: string;
+  secretName?: string;
+  generateStringKey?: string;
 }
 
 export class RdsStack extends cdk.Stack {
-  private readonly lambdaBucket: s3.Bucket;
+  private readonly rdsSecret: sm.Secret;
 
   constructor(scope: cdk.Construct, id: string, vpc: ec2.Vpc, lambdaSg: ec2.SecurityGroup, bastionSg: ec2.SecurityGroup, kmsKey: kms.Key, props: RdsStackProps) {
     super(scope, id, props);
 
     const {
       envName,
+      secretName = `${envName}/rdsSecret`,
+      generateStringKey = 'password'
     } = props;
+
+    this.rdsSecret = new sm.Secret(this, 'rdsSecret', {
+      secretName,
+      generateSecretString: {
+        includeSpace: false,
+        passwordLength: 15,
+        generateStringKey,
+        excludePunctuation: true,
+        secretStringTemplate: JSON.stringify({'user': 'password'})
+      }
+    })
 
   }
 }
