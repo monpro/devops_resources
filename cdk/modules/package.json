@@ -1,39 +1,48 @@
 {
-  "name": "modules",
-  "version": "0.1.0",
-  "bin": {
-    "modules": "bin/modules.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "test": "jest",
-    "cdk": "cdk"
-  },
-  "devDependencies": {
-    "@aws-cdk/assert": "1.91.0",
-    "@types/jest": "^26.0.10",
-    "@types/node": "10.17.27",
-    "aws-cdk": "1.91.0",
-    "jest": "^26.4.2",
-    "ts-jest": "^26.2.0",
-    "ts-node": "^9.0.0",
-    "typescript": "~3.9.7"
-  },
-  "dependencies": {
-    "@aws-cdk/aws-apigateway": "^1.92.0",
-    "@aws-cdk/aws-cognito": "^1.92.0",
-    "@aws-cdk/aws-ec2": "^1.91.0",
-    "@aws-cdk/aws-elasticache": "^1.92.0",
-    "@aws-cdk/aws-iam": "^1.91.0",
-    "@aws-cdk/aws-kms": "^1.91.0",
-    "@aws-cdk/aws-lambda": "^1.92.0",
-    "@aws-cdk/aws-rds": "^1.92.0",
-    "@aws-cdk/aws-s3": "^1.91.0",
-    "@aws-cdk/aws-secretsmanager": "^1.92.0",
-    "@aws-cdk/aws-sqs": "^1.92.0",
-    "@aws-cdk/aws-ssm": "^1.91.0",
-    "@aws-cdk/core": "^1.91.0",
-    "source-map-support": "^0.5.16"
-  }
+    "name": "modules",
+    "version": "0.1.0",
+    "bin": {
+        "modules": "bin/modules.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc -w",
+        "test": "jest",
+        "cdk": "cdk",
+        "prettier": "npx prettier --write ."
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged"
+        }
+    },
+    "devDependencies": {
+        "@aws-cdk/assert": "1.91.0",
+        "@types/jest": "^26.0.10",
+        "@types/node": "10.17.27",
+        "aws-cdk": "1.91.0",
+        "husky": "^5.1.3",
+        "jest": "^26.4.2",
+        "prettier": "2.2.1",
+        "pretty-quick": "^3.1.0",
+        "ts-jest": "^26.2.0",
+        "ts-node": "^9.0.0",
+        "typescript": "~3.9.7"
+    },
+    "dependencies": {
+        "@aws-cdk/aws-apigateway": "^1.92.0",
+        "@aws-cdk/aws-cognito": "^1.92.0",
+        "@aws-cdk/aws-ec2": "^1.91.0",
+        "@aws-cdk/aws-elasticache": "^1.92.0",
+        "@aws-cdk/aws-iam": "^1.91.0",
+        "@aws-cdk/aws-kms": "^1.91.0",
+        "@aws-cdk/aws-lambda": "^1.92.0",
+        "@aws-cdk/aws-rds": "^1.92.0",
+        "@aws-cdk/aws-s3": "^1.91.0",
+        "@aws-cdk/aws-secretsmanager": "^1.92.0",
+        "@aws-cdk/aws-sqs": "^1.92.0",
+        "@aws-cdk/aws-ssm": "^1.91.0",
+        "@aws-cdk/core": "^1.91.0",
+        "source-map-support": "^0.5.16"
+    }
 }
