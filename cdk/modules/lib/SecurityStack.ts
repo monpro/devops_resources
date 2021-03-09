@@ -76,7 +76,7 @@ export class SecurityStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, 'redisExportSg', {
-      exportName: 'redisSgGroupId',
+      exportName: 'redisSgAllowLambda',
       value: redisSg.securityGroupId
     })
   }
