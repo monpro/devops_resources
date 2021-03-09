@@ -12,6 +12,7 @@ import {RedisStack} from "../lib/RedisStack";
 import {CognitoStack} from "../lib/CognitoStack";
 import {ApiGatewayStack} from "../lib/ApiGatewayStack";
 import {LambdaStack} from "../lib/LambdaStack";
+import {SqsStack} from "../lib/SqsStack";
 
 const app = new cdk.App();
 const {vpc} = new VpcStack(app, 'VpcStack', {
@@ -70,3 +71,5 @@ new ApiGatewayStack(app, 'ApiGatewayStack', {
 new LambdaStack(app, 'LambdaStack', {
   envName: 'dev'
 });
+
+new SqsStack(app, 'SqsStack');
