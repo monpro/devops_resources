@@ -19,5 +19,27 @@ export class KmsStack extends cdk.Stack {
 
   constructor(scope: cdk.Construct, id: string, props: SqsSnsStackProps) {
     super(scope, id, props);
+
+    const encryptionKey = new kms.Key(this, 'encryptionKey');
+
+    const queue = new sqs.Queue(this, 'sqsQueue', {
+      visibilityTimeout: cdk.Duration.seconds(300),
+      encryption: sqs.QueueEncryption.KMS,
+      dataKeyReuse: cdk.Duration.minutes(10),
+      encryptionMasterKey: encryptionKey.addAlias('encryption/sqs')
+    });
+
+    const topic = new sns.Topic(this, 'snsTopic', {
+      masterKey: encryptionKey.addAlias('encryption/sns')
+    });
+
+    const testFunction = new lambdaNode.NodejsFunction(this, 'testFunction', {
+      entry: 'resource/nodeTest.ts',
+      handler: 'start',
+      environment: {
+        TOPIC_ARN: topic.topicArn,
+      }
+    })
+
   }
 }
