@@ -13,7 +13,7 @@ import { CognitoStack } from '../lib/CognitoStack';
 import { ApiGatewayStack } from '../lib/ApiGatewayStack';
 import { LambdaStack } from '../lib/LambdaStack';
 import { SqsStack } from '../lib/SqsStack';
-import { SqsApiGateway } from "../lib/SqsApiGateway";
+import { SqsApiGateway } from '../lib/SqsApiGateway';
 
 const app = new cdk.App();
 const { vpc } = new VpcStack(app, 'VpcStack', {
@@ -78,7 +78,6 @@ new LambdaStack(app, 'LambdaStack', {
   envName: 'dev',
 });
 
-const {queue, sendingRoles} = new SqsStack(app, 'SqsStack');
-
+const { queue, sendingRoles } = new SqsStack(app, 'SqsStack');
 
 new SqsApiGateway(app, 'SqsApiGateway', queue, sendingRoles);
