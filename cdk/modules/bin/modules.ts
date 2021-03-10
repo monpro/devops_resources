@@ -14,6 +14,7 @@ import { ApiGatewayStack } from '../lib/ApiGatewayStack';
 import { LambdaStack } from '../lib/LambdaStack';
 import { SqsStack } from '../lib/SqsStack';
 import { SqsApiGateway } from '../lib/SqsApiGateway';
+import { SqsSnsStack } from "../usecase/SqsSnsStack";
 
 const app = new cdk.App();
 const { vpc } = new VpcStack(app, 'VpcStack', {
@@ -81,3 +82,5 @@ new LambdaStack(app, 'LambdaStack', {
 const { queue, sendingRoles } = new SqsStack(app, 'SqsStack');
 
 new SqsApiGateway(app, 'SqsApiGateway', queue, sendingRoles);
+
+new SqsSnsStack(app, 'SqsSnsStack');

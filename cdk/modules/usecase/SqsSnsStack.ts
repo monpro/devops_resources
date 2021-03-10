@@ -14,13 +14,21 @@ interface SqsSnsStackProps extends cdk.StackProps {}
  *  sqs will subscribe to the sns which means sns would send the message to sqs
  *  It's a traditional architecture
  */
-export class KmsStack extends cdk.Stack {
-  public readonly kmsKey: kms.Key;
+export class SqsSnsStack extends cdk.Stack {
 
-  constructor(scope: cdk.Construct, id: string, props: SqsSnsStackProps) {
+  constructor(scope: cdk.Construct, id: string, props?: SqsSnsStackProps) {
     super(scope, id, props);
 
     const encryptionKey = new kms.Key(this, 'encryptionKey');
+
+    encryptionKey.addToResourcePolicy(
+      new iam.PolicyStatement({
+        sid: "sns-access",
+        effect: iam.Effect.ALLOW,
+        principals: [new iam.ServicePrincipal("sns")],
+        actions: ["kms:Decrypt", "kms:GenerateDataKey"],
+      })
+    );
 
     const queue = new sqs.Queue(this, 'sqsQueue', {
       visibilityTimeout: cdk.Duration.seconds(300),
@@ -33,13 +41,24 @@ export class KmsStack extends cdk.Stack {
       masterKey: encryptionKey.addAlias('encryption/sns')
     });
 
+    topic.addSubscription(
+      new snsSubscription.SqsSubscription(queue, {
+        rawMessageDelivery: true,
+      })
+    );
+
     const testFunction = new lambdaNode.NodejsFunction(this, 'testFunction', {
       entry: 'resource/nodeTest.ts',
       handler: 'start',
       environment: {
         TOPIC_ARN: topic.topicArn,
       }
-    })
+    });
+
+    encryptionKey.grant(testFunction, "kms:Decrypt", "kms:GenerateDataKey");
+
+    topic.grantPublish(testFunction);
+
 
   }
 }

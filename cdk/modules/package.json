@@ -46,6 +46,9 @@
         "@aws-cdk/aws-sqs": "^1.92.0",
         "@aws-cdk/aws-ssm": "^1.91.0",
         "@aws-cdk/core": "^1.91.0",
+        "@types/aws-lambda": "^8.10.72",
+        "aws-lambda": "^1.0.6",
+        "aws-sdk": "^2.860.0",
         "source-map-support": "^0.5.16"
     }
 }
