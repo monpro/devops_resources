@@ -11,8 +11,10 @@ interface S3StackProps extends cdk.StackProps {
   removalPolicy: cdk.RemovalPolicy;
 }
 
-export class S3Stack extends cdk.Stack {
-  private readonly lambdaBucket: s3.Bucket;
+export class LambdaS3Stack extends cdk.Stack {
+  public readonly lambdaBucket: s3.Bucket;
+  public readonly backendArtifactBucket: s3.Bucket;
+  public readonly frontendArtifactBucket: s3.Bucket;
 
   constructor(scope: cdk.Construct, id: string, props: S3StackProps) {
     super(scope, id, props);
@@ -43,5 +45,6 @@ export class S3Stack extends cdk.Stack {
       parameterName: `/${envName}/${bucketName}`,
       stringValue: this.lambdaBucket.bucketName,
     });
+
   }
 }

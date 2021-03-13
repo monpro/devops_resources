@@ -5,7 +5,7 @@ import { VpcStack } from '../lib/VpcStack';
 import { SecurityStack } from '../lib/SecurityStack';
 import { BastionHostStack } from '../lib/BastionHostStack';
 import { KmsStack } from '../lib/KmsStack';
-import { S3Stack } from '../lib/S3Stack';
+import { LambdaS3Stack } from '../lib/LambdaS3Stack';
 import * as s3 from '@aws-cdk/aws-s3';
 import { RdsStack } from '../lib/RdsStack';
 import { RedisStack } from '../lib/RedisStack';
@@ -43,7 +43,7 @@ new BastionHostStack(app, 'BastionHostStack', vpc, bastionSg, {
   keyName: 'monCdkKey',
 });
 
-new S3Stack(app, 'S3Stack', {
+new LambdaS3Stack(app, 'S3Stack', {
   envName: 'dev',
   bucketId: 'lambda-bucket',
   accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
