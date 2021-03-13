@@ -15,7 +15,6 @@ interface SqsSnsStackProps extends cdk.StackProps {}
  *  It's a traditional architecture
  */
 export class SqsSnsStack extends cdk.Stack {
-
   constructor(scope: cdk.Construct, id: string, props?: SqsSnsStackProps) {
     super(scope, id, props);
 
@@ -23,10 +22,10 @@ export class SqsSnsStack extends cdk.Stack {
 
     encryptionKey.addToResourcePolicy(
       new iam.PolicyStatement({
-        sid: "sns-access",
+        sid: 'sns-access',
         effect: iam.Effect.ALLOW,
-        principals: [new iam.ServicePrincipal("sns")],
-        actions: ["kms:Decrypt", "kms:GenerateDataKey"],
+        principals: [new iam.ServicePrincipal('sns')],
+        actions: ['kms:Decrypt', 'kms:GenerateDataKey'],
       })
     );
 
@@ -34,11 +33,11 @@ export class SqsSnsStack extends cdk.Stack {
       visibilityTimeout: cdk.Duration.seconds(300),
       encryption: sqs.QueueEncryption.KMS,
       dataKeyReuse: cdk.Duration.minutes(10),
-      encryptionMasterKey: encryptionKey.addAlias('encryption/sqs')
+      encryptionMasterKey: encryptionKey.addAlias('encryption/sqs'),
     });
 
     const topic = new sns.Topic(this, 'snsTopic', {
-      masterKey: encryptionKey.addAlias('encryption/sns')
+      masterKey: encryptionKey.addAlias('encryption/sns'),
     });
 
     topic.addSubscription(
@@ -52,13 +51,11 @@ export class SqsSnsStack extends cdk.Stack {
       handler: 'start',
       environment: {
         TOPIC_ARN: topic.topicArn,
-      }
+      },
     });
 
-    encryptionKey.grant(testFunction, "kms:Decrypt", "kms:GenerateDataKey");
+    encryptionKey.grant(testFunction, 'kms:Decrypt', 'kms:GenerateDataKey');
 
     topic.grantPublish(testFunction);
-
-
   }
 }

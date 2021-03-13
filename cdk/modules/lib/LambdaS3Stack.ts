@@ -45,6 +45,5 @@ export class LambdaS3Stack extends cdk.Stack {
       parameterName: `/${envName}/${bucketName}`,
       stringValue: this.lambdaBucket.bucketName,
     });
-
   }
 }
