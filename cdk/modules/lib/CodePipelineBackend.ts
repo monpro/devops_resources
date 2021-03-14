@@ -96,7 +96,7 @@ export class CodePipelineBackend extends cdk.Stack {
           },
           artifacts: {
             files: ['**/*'],
-            'base-directory': '.serverless'
+            'base-directory': '.serverless',
           },
         }),
       }
