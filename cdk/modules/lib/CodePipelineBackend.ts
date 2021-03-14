@@ -32,6 +32,16 @@ export class CodePipelineBackend extends cdk.Stack {
       bucketName
     );
 
+    const backendPipeline = new codePipeline.Pipeline(
+      this,
+      `${envName}-backend-pipeline`,
+      {
+        pipelineName: `${envName}-backend-pipeline`,
+        artifactBucket: artifactBucket,
+        restartExecutionOnUpdate: false,
+      }
+    );
+
     const buildProject = new codeBuild.PipelineProject(
       this,
       'build-backend-project',
@@ -58,25 +68,30 @@ export class CodePipelineBackend extends cdk.Stack {
         buildSpec: codeBuild.BuildSpec.fromObject({
           version: '0.1',
           phases: {
-            install: {},
-            pre_build: {},
-            build: {},
+            install: {
+              commands: [
+                'echo "--INSTALL PHASE--"',
+                'npm install --silent --no-progress serverless -g',
+              ],
+              pre_build: {
+                commands: [
+                  'echo "--PRE BUILD PHASE --"',
+                  'npm install --silent --no-progress',
+                ],
+              },
+              build: {
+                commands: [
+                  'echo "--BUILD PHASE--"',
+                  'serverless deploy -s $STAGE',
+                ],
+              },
+            },
           },
           artifacts: {
             files: ['**/*'],
             'base-directory': '.serverless',
           },
         }),
-      }
-    );
-
-    const backendPipeline = new codePipeline.Pipeline(
-      this,
-      `${envName}-backend-pipeline`,
-      {
-        pipelineName: `${envName}-backend-pipeline`,
-        artifactBucket: artifactBucket,
-        restartExecutionOnUpdate: false,
       }
     );
 
@@ -93,6 +108,18 @@ export class CodePipelineBackend extends cdk.Stack {
           branch: 'master',
           owner: 'monpro',
           actionName: 'GitHubSource',
+        }),
+      ],
+    });
+
+    backendPipeline.addStage({
+      stageName: 'Deploy',
+      actions: [
+        new pipelineAction.CodeBuildAction({
+          actionName: 'DeployToDev',
+          input: sourceOutput,
+          project: buildProject,
+          outputs: [buildOutput],
         }),
       ],
     });
