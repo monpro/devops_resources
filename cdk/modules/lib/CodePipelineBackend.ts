@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as codePipeline from '@aws-cdk/aws-codepipeline';
 import * as pipelineAction from '@aws-cdk/aws-codepipeline-actions';
+import * as codeBuild from '@aws-cdk/aws-codebuild';
 
 interface CodePipelineBackendProps extends cdk.StackProps {
   envName: string;
@@ -31,7 +32,45 @@ export class CodePipelineBackend extends cdk.Stack {
       bucketName
     );
 
-    const pipeline = new codePipeline.Pipeline(
+    const buildProject = new codeBuild.PipelineProject(
+      this,
+      'build-backend-project',
+      {
+        projectName: `${envName}-build-backend-project`,
+        description: `${envName}-lambda-function-build`,
+        environment: {
+          buildImage: codeBuild.LinuxBuildImage.STANDARD_3_0,
+          environmentVariables: {
+            ENV: {
+              value: 'dev',
+            },
+            PRJ: {
+              value: 'monBackendBuild',
+            },
+            STAGE: {
+              value: 'dev',
+            },
+          },
+        },
+        cache: codeBuild.Cache.bucket(artifactBucket, {
+          prefix: 'lambda-build-cache',
+        }),
+        buildSpec: codeBuild.BuildSpec.fromObject({
+          version: '0.1',
+          phases: {
+            install: {},
+            pre_build: {},
+            build: {},
+          },
+          artifacts: {
+            files: ['**/*'],
+            'base-directory': '.serverless',
+          },
+        }),
+      }
+    );
+
+    const backendPipeline = new codePipeline.Pipeline(
       this,
       `${envName}-backend-pipeline`,
       {
@@ -44,9 +83,18 @@ export class CodePipelineBackend extends cdk.Stack {
     const sourceOutput = new codePipeline.Artifact('source');
     const buildOutput = new codePipeline.Artifact('build');
 
-    pipeline.addStage({
+    backendPipeline.addStage({
       stageName: 'Source',
-      actions: [],
+      actions: [
+        new pipelineAction.GitHubSourceAction({
+          oauthToken: githubToken,
+          output: sourceOutput,
+          repo: 'devops_resources',
+          branch: 'master',
+          owner: 'monpro',
+          actionName: 'GitHubSource',
+        }),
+      ],
     });
   }
 }
