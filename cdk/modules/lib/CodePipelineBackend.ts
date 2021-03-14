@@ -3,6 +3,8 @@ import * as s3 from '@aws-cdk/aws-s3';
 import * as codePipeline from '@aws-cdk/aws-codepipeline';
 import * as pipelineAction from '@aws-cdk/aws-codepipeline-actions';
 import * as codeBuild from '@aws-cdk/aws-codebuild';
+import * as iam from '@aws-cdk/aws-iam';
+import * as ssm from '@aws-cdk/aws-ssm';
 
 interface CodePipelineBackendProps extends cdk.StackProps {
   envName: string;
@@ -18,9 +20,11 @@ export class CodePipelineBackend extends cdk.Stack {
     super(scope, id, props);
 
     const { envName } = props;
+    const accountId = cdk.Aws.ACCOUNT_ID;
+    const region = cdk.Aws.REGION;
 
     const githubToken = cdk.SecretValue.secretsManager(
-      `${envName}/github-token`,
+      `${envName}/github-build-token`,
       {
         jsonField: 'github-build-token',
       }
@@ -44,7 +48,7 @@ export class CodePipelineBackend extends cdk.Stack {
 
     const buildProject = new codeBuild.PipelineProject(
       this,
-      'build-backend-project',
+      `${envName}-build-backend-project`,
       {
         projectName: `${envName}-build-backend-project`,
         description: `${envName}-lambda-function-build`,
@@ -52,12 +56,15 @@ export class CodePipelineBackend extends cdk.Stack {
           buildImage: codeBuild.LinuxBuildImage.STANDARD_3_0,
           environmentVariables: {
             ENV: {
+              type: codeBuild.BuildEnvironmentVariableType.PLAINTEXT,
               value: 'dev',
             },
             PRJ: {
+              type: codeBuild.BuildEnvironmentVariableType.PLAINTEXT,
               value: 'monBackendBuild',
             },
             STAGE: {
+              type: codeBuild.BuildEnvironmentVariableType.PLAINTEXT,
               value: 'dev',
             },
           },
@@ -73,23 +80,23 @@ export class CodePipelineBackend extends cdk.Stack {
                 'echo "--INSTALL PHASE--"',
                 'npm install --silent --no-progress serverless -g',
               ],
-              pre_build: {
-                commands: [
-                  'echo "--PRE BUILD PHASE --"',
-                  'npm install --silent --no-progress',
-                ],
-              },
-              build: {
-                commands: [
-                  'echo "--BUILD PHASE--"',
-                  'serverless deploy -s $STAGE',
-                ],
-              },
+            },
+            pre_build: {
+              commands: [
+                'echo "--PRE BUILD PHASE --"',
+                'npm install --silent --no-progress',
+              ],
+            },
+            build: {
+              commands: [
+                'echo "--BUILD PHASE--"',
+                'serverless deploy -s $STAGE',
+              ],
             },
           },
           artifacts: {
             files: ['**/*'],
-            'base-directory': '.serverless',
+            'base-directory': '.serverless'
           },
         }),
       }
@@ -104,8 +111,8 @@ export class CodePipelineBackend extends cdk.Stack {
         new pipelineAction.GitHubSourceAction({
           oauthToken: githubToken,
           output: sourceOutput,
-          repo: 'devops_resources',
-          branch: 'master',
+          repo: 'serverless-application',
+          branch: 'main',
           owner: 'monpro',
           actionName: 'GitHubSource',
         }),
@@ -122,6 +129,37 @@ export class CodePipelineBackend extends cdk.Stack {
           outputs: [buildOutput],
         }),
       ],
+    });
+
+    buildProject.role?.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')
+    );
+
+    /**
+     * You could use addToPolicy to customise the policyStatement
+     *
+    buildProject.role?.addToPolicy(
+      new iam.PolicyStatement({
+        actions: [
+          'cloudformation:*',
+          's3:*',
+          'iam:*',
+          'lambda:*',
+          'apigateway:*',
+        ],
+        resources: ['*'],
+      })
+    );
+     **/
+
+    new ssm.StringParameter(this, 'accountId', {
+      parameterName: `/${envName}/account-id`,
+      stringValue: accountId,
+    });
+
+    new ssm.StringParameter(this, 'region', {
+      parameterName: `/${envName}/region`,
+      stringValue: region,
     });
   }
 }

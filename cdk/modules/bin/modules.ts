@@ -16,6 +16,7 @@ import { SqsStack } from '../lib/SqsStack';
 import { SqsApiGateway } from '../lib/SqsApiGateway';
 import { SqsSnsStack } from '../usecase/SqsSnsStack';
 import { CodePipelineBackend } from '../lib/CodePipelineBackend';
+import { ArtifactS3Stack } from '../lib/ArtifactS3Stack';
 
 const app = new cdk.App();
 const { vpc } = new VpcStack(app, 'VpcStack', {
@@ -86,9 +87,16 @@ new SqsApiGateway(app, 'SqsApiGateway', queue, sendingRoles);
 
 new SqsSnsStack(app, 'SqsSnsStack');
 
+/**
+ *
+ */
+new ArtifactS3Stack(app, 'ArtifactS3Stack', {
+  envName: 'dev',
+});
+
 new CodePipelineBackend(
   app,
-  'codePipelineBucket',
+  'CodePipelineBackendStack',
   cdk.Fn.importValue('dev-artifact-bucket'),
   {
     envName: 'dev',
