@@ -17,6 +17,7 @@ import { SqsApiGateway } from '../lib/SqsApiGateway';
 import { SqsSnsStack } from '../usecase/SqsSnsStack';
 import { CodePipelineBackend } from '../lib/CodePipelineBackend';
 import { ArtifactS3Stack } from '../lib/ArtifactS3Stack';
+import StepFunctionStack from "../lib/stepfunction";
 
 const app = new cdk.App();
 const { vpc } = new VpcStack(app, 'VpcStack', {
@@ -102,3 +103,5 @@ new CodePipelineBackend(
     envName: 'dev',
   }
 );
+
+new StepFunctionStack(app, "StepFunctionStack");
